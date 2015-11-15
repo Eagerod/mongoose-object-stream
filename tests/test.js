@@ -54,11 +54,10 @@ BehaviorTests.setUp = function(done) {
 };
 
 BehaviorTests["String Test"] = function(test) {
-    var self = this;
     test.expect(4);
     var stream = new MongooseObjectStream(this.model);
 
-    var date = new Date()
+    var date = new Date();
     stream.write(JSON.stringify({akey: "stringythingy", bkey: date}));
     stream.end();
     stream.on("finish", function() {
@@ -73,11 +72,10 @@ BehaviorTests["String Test"] = function(test) {
 };
 
 BehaviorTests["Object Test"] = function(test) {
-    var self = this;
     test.expect(4);
     var stream = new MongooseObjectStream(this.model);
 
-    var date = new Date()
+    var date = new Date();
     stream.write({akey: "stringythingy", bkey: date});
     stream.end();
     stream.on("finish", function() {
@@ -92,7 +90,6 @@ BehaviorTests["Object Test"] = function(test) {
 };
 
 BehaviorTests["Batch Test"] = function(test) {
-    var self = this;
     test.expect(2 + 5 * 2);
     var stream = new MongooseObjectStream(this.model);
 
