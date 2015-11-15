@@ -2,7 +2,6 @@
     "name": "mongoose-object-stream",
     "description": "A small package that allows you stream data directly into mongo databases through mongoose.",
     "version": "0.0.1",
-    "private": true,
     "keywords": [
         "mongoose",
         "stream",
