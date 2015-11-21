@@ -2,6 +2,7 @@
 
 var mongoose = require("mongoose");
 var async = require("async");
+var mock = require("nodeunit-mock");
 
 var MongooseObjectStream = require("..");
 
@@ -165,6 +166,36 @@ UpsertTests["Success no _id"] = function(test) {
         });
     });
     stream.end();
+};
+
+UpsertTests["Failure upsert false collision"] = function(test) {
+    var self = this;
+    test.expect(7);
+    this.model = mongoose.connection.base.models.BModel; // autogen id.
+    
+    mock(test, MongooseObjectStream, "_write", function(chunk, encoding, callback) {
+        this.unmocked__write(chunk, encoding, function(err) {
+            test.equal(err.name, "MongoError");
+            test.equal(err.code, 11000);
+            callback();
+        });
+    });
+
+    new this.model({akey: "a"}).save(function(err, entity) {
+        test.ifError(err);
+        var stream = new MongooseObjectStream(self.model);
+        stream.write({_id: entity._id, akey: "b"});
+        stream.on("finish", function() {
+            stream.Model.find(function(err, models) {
+                test.ifError(err);
+                test.equal(models.length, 1);
+                test.equal(models[0].id, entity.id);
+                test.equal(models[0].akey, "a");
+                test.done();
+            });
+        });
+        stream.end();
+    });
 };
 
 TearDown["Disconnect Mongoose"] = function(test) {
