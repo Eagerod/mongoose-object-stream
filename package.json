@@ -1,7 +1,7 @@
 {
     "name": "mongoose-object-stream",
     "description": "A small package that allows you stream data directly into mongo databases through mongoose.",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "keywords": [
         "mongoose",
         "stream",
@@ -26,6 +26,7 @@
         "name": "Aleem Haji",
         "author": "hajial@gmail.com"
     },
+    "license": "MIT",
     "scripts": {
         "test": "./node_modules/.bin/nodeunit tests/test.js",
         "docs": "./node_modules/.bin/jsdoc --recurse ./lib -d docs",
