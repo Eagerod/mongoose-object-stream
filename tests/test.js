@@ -2,6 +2,7 @@
 
 var mongoose = require("mongoose");
 var async = require("async");
+var mock = require("nodeunit-mock");
 
 var MongooseObjectStream = require("..");
 
@@ -131,11 +132,12 @@ UpsertTests.setUp = function(done) {
 };
 
 UpsertTests["Success"] = function(test) {
-    test.expect(5);
+    test.expect(6);
     var stream = new MongooseObjectStream(this.model, {upsert: true});
     var entity = new this.model({_id: "a"});
     entity.save(function(err) {
         test.ifError(err);
+        test.equal(entity.akey, undefined);
         stream.write({_id: "a", akey: "b"});
         stream.end();
         stream.on("finish", function() {
