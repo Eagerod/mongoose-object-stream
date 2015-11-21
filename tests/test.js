@@ -9,6 +9,7 @@ var Tests = module.exports;
 var Setup = Tests["Setup Tests"] = {};
 var CreationTests = Tests["Creation Tests"] = {};
 var BehaviorTests = Tests["Behavior Tests"] = {};
+var UpsertTests = BehaviorTests["Upsert Tests"] = {};
 var TearDown = Tests["Tear Down Tests"] = {};
 
 Setup["Connect Mongoose"] = function(test) {
@@ -112,6 +113,57 @@ BehaviorTests["Batch Test"] = function(test) {
             test.done();
         });
     });
+};
+
+UpsertTests.setUp = function(done) {
+    if ( mongoose.connection.base.models.CModel ) {
+        this.model = mongoose.connection.base.models.CModel;
+    }
+    else {
+        var schema = new mongoose.Schema({_id: String, akey: String});
+        var model = mongoose.model("CModel", schema);
+        this.model = model;
+    }
+
+    async.each(Object.keys(mongoose.connection.base.models), function(ent, cb) {
+        mongoose.connection.base.models[ent].remove({}, cb);
+    }, done);
+};
+
+UpsertTests["Success"] = function(test) {
+    test.expect(5);
+    var stream = new MongooseObjectStream(this.model, {upsert: true});
+    var entity = new this.model({_id: "a"});
+    entity.save(function(err) {
+        test.ifError(err);
+        stream.write({_id: "a", akey: "b"});
+        stream.end();
+        stream.on("finish", function() {
+            stream.Model.find(function(err, models) {
+                test.ifError(err);
+                test.equal(models.length, 1);
+                test.equal(models[0]._id, "a");
+                test.equal(models[0].akey, "b");
+                test.done();
+            });
+        });
+    });
+};
+
+UpsertTests["Success no _id"] = function(test) {
+    test.expect(3);
+    this.model = mongoose.connection.base.models.BModel; // autogen id.
+    var stream = new MongooseObjectStream(this.model, {upsert: true});
+    stream.write({akey: "b"});
+    stream.on("finish", function() {
+        stream.Model.find(function(err, models) {
+            test.ifError(err);
+            test.equal(models.length, 1);
+            test.equal(models[0].akey, "b");
+            test.done();
+        });
+    });
+    stream.end();
 };
 
 TearDown["Disconnect Mongoose"] = function(test) {
