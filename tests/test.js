@@ -2,7 +2,6 @@
 
 var mongoose = require("mongoose");
 var async = require("async");
-var mock = require("nodeunit-mock");
 
 var MongooseObjectStream = require("..");
 
